@@ -15,7 +15,7 @@ const getCines = async () => {
             <span>${cine.Direccion} - ${cine.Ciudad}<br /><br />Teléfono: ${cine.Telefonos}</span>
           </div>
           <br />
-          <a href="http://www.cinestar.com.pe/multicines/cine/${encodeURIComponent(cine.RazonSocial)}">
+          <a href="http://127.0.0.1:3000/cinestar_html/cine.html?&id=${cine.id}">
             <img src="img/varios/ico-info2.png" width="150" height="40" />
           </a>
         </div>
