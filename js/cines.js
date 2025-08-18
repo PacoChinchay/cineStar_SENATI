@@ -6,7 +6,7 @@ const getCines = async () => {
     const contenedor = document.getElementById("contenido-interno");
     contenedor.innerHTML = `<br /><h1>Nuestros Cines</h1><br />`;
 
-    json.data.forEach(cine => { 
+    json.data.forEach(cine => {
       const html = `
         <div class="contenido-cine">
           <img src="img/cine/${cine.id}.1.jpg" width="227" height="170" />
@@ -15,7 +15,7 @@ const getCines = async () => {
             <span>${cine.Direccion} - ${cine.Ciudad}<br /><br />Teléfono: ${cine.Telefonos}</span>
           </div>
           <br />
-          <a href="http://127.0.0.1:3000/cinestar_html/cine.html?&id=${cine.id}">
+          <a href="cine.html?&id=${cine.id}">
             <img src="img/varios/ico-info2.png" width="150" height="40" />
           </a>
         </div>
