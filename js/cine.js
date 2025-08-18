@@ -1,28 +1,36 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC9_6kHjDTEpFBBSqodpz2fpOuzh88X4gE",
+  authDomain: "cine-star-2137c.firebaseapp.com",
+  projectId: "cine-star-2137c",
+  storageBucket: "cine-star-2137c.firebasestorage.app",
+  messagingSenderId: "45216427402",
+  appId: "1:45216427402:web:25d6a8ed96ca5ff2226c73"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const getCine = async () => {
   const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
-
+  const idUrl = params.get("id");
   try {
-    const res = await fetch(`http://localhost/cinestar_sweb_php/cines/${id}`);
-    const json = await res.json();
+    const q = query(collection(db, "cines"), where("id", "==", idUrl));
+    const querySnap = await getDocs(q);
 
-    if (json.success && json.data) {
-      const cine = json.data;
+    if (!querySnap.empty) {
+      const cineDoc = querySnap.docs[0];
+      const cine = cineDoc.data();
+
       const contenedor = document.getElementById("contenido-interno");
-
-      const tarifasHTML = cine.tarifas.map((tarifa, i) => `
-        <div class="fila ${i % 2 === 1 ? "impar" : ""}">
-          <div class="celda-titulo">${tarifa.DiasSemana}</div>
-          <div class="celda">${tarifa.Precio}</div>
-        </div>
-      `).join("");
-
-      const peliculasHTML = cine.peliculas.map((peli, i) => `
-        <div class="fila ${i % 2 === 1 ? "impar" : ""}">
-          <div class="celda-titulo">${peli.Titulo}</div>
-          <div class="celda">${peli.Horarios}</div>
-        </div>
-      `).join("");
 
       contenedor.innerHTML = `
         <h2>${cine.RazonSocial}</h2>
@@ -31,14 +39,43 @@ const getCine = async () => {
             <p>${cine.Direccion} - ${cine.Ciudad}</p>
             <p>Teléfono: ${cine.Telefonos} anexo 865</p>
             <br/>
-            <div class="tabla">
-              ${tarifasHTML}
+            <div class="tabla"> 
+            <div class="fila"> 
+            <div class="celda-titulo">Lunes y Miércoles</div> 
+            <div class="celda">S/. 4.00</div>
             </div>
+            <div class="fila impar"> 
+            <div class="celda-titulo">Martes</div>
+            <div class="celda">S/. 3.50</div> 
+            </div> 
+            <div class="fila"> 
+            <div class="celda-titulo">Jueves y Viernes</div> 
+            <div class="celda">S/. 6.50</div> 
+            </div> 
+            <div class="fila impar"> 
+            <div class="celda-titulo">Sábado, Domingo y Feriados</div> 
+            <div class="celda">S/. 7.50</div> </div> 
+            <div class="fila"> 
+            <div class="celda-titulo">Adulto mayor y niños hasta 8 años (sábados, domingos y feriados)</div> 
+            <div class="celda">S/. 4.00</div> 
+            </div> <div class="fila impar"> 
+            <div class="celda-titulo">3D - Lunes y Miércoles</div> 
+            <div class="celda">S/. 7.50</div> 
+            </div> <div class="fila"> 
+            <div class="celda-titulo">3D - Martes</div>
+            <div class="celda">S/. 6.00</div> 
+            </div> <div class="fila impar"> 
+            <div class="celda-titulo">3D - Jueves a Domingo y Feriados</div> 
+            <div class="celda">S/. 11.00</div>
+             </div>
+             </div>
+            
+            
             <div class="aviso">
               <p>A partir del 1ro de julio de 2016, Cinestar Multicines realizará el cobro de la comisión de S/. 1.00
-							adicional al tarifario vigente, a los usuarios que compren sus entradas por el aplicativo de Cine Papaya
-							para Cine Star Comas, Excelsior, Las Américas, Benavides, Breña, San Juan, UNI, Aviación, Sur, Porteño,
-							Tumbes y Tacna.</p>
+                 adicional al tarifario vigente, a los usuarios que compren sus entradas por el aplicativo de Cine Papaya
+                 para Cine Star Comas, Excelsior, Las Américas, Benavides, Breña, San Juan, UNI, Aviación, Sur, Porteño,
+                 Tumbes y Tacna.</p>
             </div>
           </div>
           <img src="img/cine/${cine.id}.2.jpg"/>
@@ -49,7 +86,7 @@ const getCine = async () => {
                 <div class="celda-cabecera">Películas</div>
                 <div class="celda-cabecera">Horarios</div>
               </div>
-              ${peliculasHTML}
+              <div class="fila impar"> <div class="celda-titulo">GUERRERO</div> <div class="celda">13:00 / 13:30 / 14:00 / 15:00 / 15:30 / 16:00 / 17:00 / 17:30 / 18:00 / 19:00 / 20:00 / 21:00 / 21:55</div> </div> <div class="fila"> <div class="celda-titulo">LA LEYENDA DE LA BELLA DURMIENTE</div> <div class="celda">19:45 / 21:30</div> </div> <div class="fila impar"> <div class="celda-titulo">ROGUE ONE</div> <div class="celda">13:00 / 14:00 / 15:30 / 16:30 / 18:00 / 19:00 / 19:30 / 20:30 / 21:30 / 21:55</div> </div> <div class="fila"> <div class="celda-titulo">MOANA</div> <div class="celda">13:00 / 15:15 / 17:30</div> </div>
             </div>
           </div>
         </div>
@@ -66,7 +103,7 @@ const getCine = async () => {
         </div>
       `;
     } else {
-      console.error("No se encontró el cine");
+      console.error("No se encontró el cine con id =", idUrl);
     }
   } catch (error) {
     console.error("Error al obtener el cine:", error);

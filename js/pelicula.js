@@ -1,23 +1,48 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC9_6kHjDTEpFBBSqodpz2fpOuzh88X4gE",
+  authDomain: "cine-star-2137c.firebaseapp.com",
+  projectId: "cine-star-2137c",
+  storageBucket: "cine-star-2137c.firebasestorage.app",
+  messagingSenderId: "45216427402",
+  appId: "1:45216427402:web:25d6a8ed96ca5ff2226c73"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const getPelicula = async () => {
   try {
     const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
-    
-    const res = await fetch(`http://localhost/cinestar_sweb_php/peliculas/${id}`);
-    const json = await res.json();
-    
-    if (!json.success || !json.data) {
-      console.error("No se encontró la película");
+    const idUrl = params.get("id");
+    const q = query(collection(db, "peliculas"), where("id", "==", idUrl));
+    const querySnap = await getDocs(q);
+
+    if (querySnap.empty) {
+      console.error("No se encontró la película con id =", idUrl);
       return;
     }
-    
-    const pelicula = json.data;
+
+    const pelicula = querySnap.docs[0].data();
     const contenedor = document.getElementById("contenido-interno");
-    
-    const fechaEstreno = new Date(pelicula.FechaEstreno);
-    const opcionesFecha = { year: 'numeric', month: 'long', day: 'numeric' };
-    const fechaFormateada = fechaEstreno.toLocaleDateString('es-ES', opcionesFecha);
-    
+
+    // Formatear fecha
+    let fechaFormateada = "";
+    if (pelicula.FechaEstreno) {
+      const fechaEstreno = new Date(pelicula.FechaEstreno);
+      const opcionesFecha = { year: "numeric", month: "long", day: "numeric" };
+      fechaFormateada = fechaEstreno.toLocaleDateString("es-ES", opcionesFecha);
+    }
+
+    // Renderizar HTML
     contenedor.innerHTML = `
       <br/><h1>${pelicula.Titulo}</h1><br/>
       <div class="contenido-pelicula">
@@ -36,7 +61,7 @@ const getPelicula = async () => {
             </div>
             <div class="fila">
               <div class="celda-titulo">Género :</div>
-              <div class="celda">${pelicula.Geneross}</div>
+              <div class="celda">${pelicula.Geneross || pelicula.Genero || ""}</div>
             </div>
             <div class="fila">
               <div class="celda-titulo">Director :</div>
@@ -51,7 +76,11 @@ const getPelicula = async () => {
         <img src="img/pelicula/${pelicula.id}.jpg" width="160" height="226"><br/><br/>
       </div>
       <div class="pelicula-video">
-        <embed src="https://www.youtube.com/v/${pelicula.Link}" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="580" height="400">
+        <embed src="https://www.youtube.com/v/${pelicula.Link}" 
+               type="application/x-shockwave-flash" 
+               allowscriptaccess="always" 
+               allowfullscreen="true" 
+               width="580" height="400">
       </div>
     `;
   } catch (error) {
